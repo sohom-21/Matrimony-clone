@@ -54,9 +54,21 @@ const Locationsearch = () => {
     setSelectedState(state);
     setDistricts(stateDistricts[state] || []);
   };
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    console.log({ gender, age, state, district, photo });
+    try {
+      const response = await fetch('http://localhost:5000/api/search/location', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ gender, age, state: selectedState, district, photo })
+      });
+      const data = await response.json();
+      window.location.href = `/search?source=location&profiles=${encodeURIComponent(JSON.stringify(data))}`;
+    } catch (error) {
+      console.error('Error performing search:', error);
+    }
   };
   return (
     <div className="flex">

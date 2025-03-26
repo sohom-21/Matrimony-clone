@@ -1,4 +1,5 @@
 import React, { useState } from "react";
+import Captcha from '../components/Captcha';
 
 const RegistrationForm = () => {
   const [formData, setFormData] = useState({
@@ -11,19 +12,17 @@ const RegistrationForm = () => {
     motherName: "",
     occupationFather: "",
     occupationMother: "",
-    knownLanguages: "",
     nativePlace: "",
-    address: "",
+    houseName: "",
     temple: "",
     presentResidence: "",
     brothers: 0,
     marriedBrothers: 0,
     sisters: 0,
     marriedSisters: 0,
-    profileCreatedBy: "",
-    referral: "",
-    referralDetails1: { name: "", phone: "", address: "" },
-    referralDetails2: { name: "", phone: "", address: "" },
+    referral1Name: "",
+    referral1Phone: "",
+    referral1Address: "",
     education: "",
     educationDetails: "",
     occupation: "",
@@ -35,6 +34,7 @@ const RegistrationForm = () => {
     complexion: "",
     diet: "",
     specialCases: "",
+    specialCasesDetails: "",
     rasi: "",
     lagnam: "",
     star: "",
@@ -42,8 +42,10 @@ const RegistrationForm = () => {
     birthPlace: "",
     birthTime: "",
     dasaType: "",
-    horoscope: "",
-    contactAddress: "",
+    dasaYear: "",
+    dasaMonth: "",
+    dasaDay: "",
+    address: "",
     mobile: "",
     city: "",
     phone: "",
@@ -59,7 +61,7 @@ const RegistrationForm = () => {
       ageFrom: "",
       ageTo: "",
       educationDetails: "",
-      jobAfterMarriage: "",
+      workAfterMarriage: "",
       complexion: "",
       heightFrom: "",
       heightTo: "",
@@ -86,9 +88,147 @@ const RegistrationForm = () => {
   };
   
 
-  const handleSubmit = (e) => {
+  const [errors, setErrors] = useState({});
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [captchaVerified, setCaptchaVerified] = useState(false);
+
+  const validateForm = () => {
+    const newErrors = {};
+    
+    // Required field validations
+    if (!formData.name.trim()) newErrors.name = 'Name is required';
+    if (!formData.maritalStatus) newErrors.maritalStatus = 'Marital status is required';
+    if (!formData.password || formData.password.length < 6) {
+      newErrors.password = 'Password must be at least 6 characters';
+    }
+    if (!formData.dob) newErrors.dob = 'Date of birth is required';
+    if (!formData.gender) newErrors.gender = 'Gender is required';
+    
+    // Email validation
+    if (!formData.email) {
+      newErrors.email = 'Email is required';
+    } else if (!/\S+@\S+\.\S+/.test(formData.email)) {
+      newErrors.email = 'Email is invalid';
+    }
+    
+    // Mobile validation
+    if (!formData.mobile) {
+      newErrors.mobile = 'Mobile number is required';
+    } else if (!/^\d{10}$/.test(formData.mobile)) {
+      newErrors.mobile = 'Mobile number must be 10 digits';
+    }
+    
+    // Additional required fields
+    if (!formData.fatherName?.trim()) newErrors.fatherName = 'Father\'s name is required';
+    if (!formData.motherName?.trim()) newErrors.motherName = 'Mother\'s name is required';
+    if (!formData.education) newErrors.education = 'Education is required';
+    if (!formData.occupation) newErrors.occupation = 'Occupation is required';
+    if (!formData.address?.trim()) newErrors.address = 'Full street address is required';
+    
+    // Numeric validations
+    if (formData.brothers < 0) newErrors.brothers = 'Brothers cannot be negative';
+    if (formData.marriedBrothers < 0) newErrors.marriedBrothers = 'Married brothers cannot be negative';
+    if (formData.sisters < 0) newErrors.sisters = 'Sisters cannot be negative';
+    if (formData.marriedSisters < 0) newErrors.marriedSisters = 'Married sisters cannot be negative';
+    
+    // WhatsApp validation (if provided)
+    if (formData.whatsapp && !/^\d{10}$/.test(formData.whatsapp)) {
+      newErrors.whatsapp = 'WhatsApp number must be 10 digits';
+    }
+    
+    // Photo validation
+    if (formData.photo) {
+      const file = formData.photo;
+      if (file.size > 1024 * 1024) { // 1MB
+        newErrors.photo = 'Photo size must be less than 1MB';
+      }
+      if (!file.type.startsWith('image/jpeg')) {
+        newErrors.photo = 'Photo must be in JPG format';
+      }
+    }
+    
+    // Partner preference validations
+    if (!formData.partnerPreference.ageFrom || !formData.partnerPreference.ageTo) {
+      newErrors.partnerAge = 'Partner age range is required';
+    }
+    if (parseInt(formData.partnerPreference.ageFrom) >= parseInt(formData.partnerPreference.ageTo)) {
+      newErrors.partnerAge = 'Invalid age range';
+    }
+    
+    // Terms and CAPTCHA validation
+    if (!formData.termsAccepted) {
+      newErrors.termsAccepted = 'You must accept the terms and conditions';
+    }
+    if (!captchaVerified) {
+      newErrors.captcha = 'Please verify the CAPTCHA';
+    }
+    
+    return newErrors;
+  };
+
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    console.log("Submitted Data:", formData);
+    const newErrors = validateForm();
+    setErrors(newErrors);
+
+    if (Object.keys(newErrors).length === 0) {
+      setIsSubmitting(true);
+      try {
+        const response = await fetch('http://localhost:5000/api/auth/register', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify(formData)
+        });
+
+        const data = await response.json();
+        
+        if (data.success) {
+          alert('Registration successful!');
+          // Reset form to initial state
+          setFormData({
+            name: "", maritalStatus: "", password: "", dob: "", gender: "",
+            fatherName: "", motherName: "", occupationFather: "", occupationMother: "",
+            nativePlace: "", houseName: "", temple: "", presentResidence: "",
+            brothers: 0, marriedBrothers: 0, sisters: 0, marriedSisters: 0,
+            referral1Name: "", referral1Phone: "", referral1Address: "",
+            education: "", educationDetails: "", occupation: "",
+            workDetails: "", workingPlace: "", income: "",
+            height: "", weight: "", complexion: "", diet: "",
+            specialCases: "", specialCasesDetails: "",
+            rasi: "", lagnam: "", star: "", dosham: "",
+            birthPlace: "", birthTime: "",
+            dasaType: "", dasaYear: "", dasaMonth: "", dasaDay: "",
+            address: "", mobile: "", city: "", phone: "",
+            state: "", whatsapp: "", district: "", email: "",
+            country: "India", photo: null, postalCode: "",
+            partnerPreference: {
+              education: "", ageFrom: "", ageTo: "",
+              educationDetails: "", workAfterMarriage: "",
+              complexion: "", heightFrom: "", heightTo: "",
+              personalPreference: ""
+            },
+            verificationCode: "",
+            termsAccepted: false
+          });
+          setCaptchaVerified(false);
+        } else {
+          setErrors({ 
+            submit: data.message || 'Registration failed',
+            ...(data.errors ? { serverValidation: data.errors } : {})
+          });
+        }
+      } catch (error) {
+        console.error('Error during registration:', error);
+        setErrors({ 
+          submit: 'Network error. Please try again.',
+          technical: error.message
+        });
+      } finally {
+        setIsSubmitting(false);
+      }
+    }
   };
 
   return (
@@ -883,14 +1023,15 @@ const RegistrationForm = () => {
       </div>
 
       {/* Verification Code */}
-      <div className="mt-4 flex flex-col">
-        <label className="font-medium">Verification Code:</label>
-        <input
-          type="text"
-          name="verificationCode"
-          value={formData.verificationCode}
-          onChange={handleChange}
-          className="border p-2 rounded w-1/2"
+      <div className="mt-4">
+        <label className="font-medium block mb-2">Verification Code:</label>
+        <Captcha
+          onVerificationChange={(value) => {
+            setFormData(prev => ({
+              ...prev,
+              verificationCode: value
+            }));
+          }}
         />
       </div>
 

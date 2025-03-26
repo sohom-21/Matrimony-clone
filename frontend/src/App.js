@@ -8,6 +8,7 @@ import Educationalsearch from './pages/Educationalsearch';
 import Locationsearch from './pages/Locationsearch';
 import Occupationalsearch from './pages/Occupationalsearch';
 import Smartsearch from './pages/Smartsearch';
+import Search from './pages/SearchResults'
 
 function App() {
   return (
@@ -20,6 +21,7 @@ function App() {
         <Route path='/locationsearch' element={<Locationsearch />} />
         <Route path='/occupationalsearch' element={<Occupationalsearch />} />
         <Route path='/smartsearch' element={<Smartsearch />} />
+        <Route path='/search' element={<Search />} />
         
       </Routes>
     </Router>

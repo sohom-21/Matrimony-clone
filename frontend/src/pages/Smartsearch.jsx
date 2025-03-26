@@ -20,10 +20,21 @@ const Smartsearch = () => {
         }));
     };
 
-    const handleSubmit = (e) => {
+    const handleSubmit = async (e) => {
         e.preventDefault();
-        console.log("Submitted Data:", formData);
-        alert("Form submitted! Check the console for form values.");
+        try {
+            const response = await fetch('http://localhost:5000/api/search/smart', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify(formData)
+            });
+            const data = await response.json();
+            window.location.href = `/search?source=smart&profiles=${encodeURIComponent(JSON.stringify(data))}`;
+        } catch (error) {
+            console.error('Error performing search:', error);
+        }
     };
     return (
         <div className="flex">

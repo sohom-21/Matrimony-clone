@@ -3,6 +3,147 @@ const Register = require("../models/Register");
 
 const router = express.Router();
 
+// Search endpoints
+router.post("/search/smart", async (req, res) => {
+  try {
+    const { txtGender, txtSAge, txtEAge, cid, sid, dateposting, txtphoto } = req.body;
+    let query = { gender: txtGender };
+
+    // Add age filter
+    query.dob = {
+      $gte: new Date().getFullYear() - parseInt(txtEAge),
+      $lte: new Date().getFullYear() - parseInt(txtSAge)
+    };
+
+    // Add temple filter if provided
+    if (cid) query.temple = cid;
+
+    // Add photo filter
+    if (txtphoto) query.photo = { $exists: true, $ne: null };
+
+    const users = await Register.find(query);
+    res.json(users);
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+});
+
+router.post("/search/educational", async (req, res) => {
+  try {
+    const { gender, startAge, endAge, education, photoOnly } = req.body;
+    let query = { gender };
+
+    // Add age filter
+    query.dob = {
+      $gte: new Date().getFullYear() - endAge,
+      $lte: new Date().getFullYear() - startAge
+    };
+
+    // Add education filter
+    if (education !== "Any") query.education = education;
+
+    // Add photo filter
+    if (photoOnly) query.photo = { $exists: true, $ne: null };
+
+    const users = await Register.find(query);
+    res.json(users);
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+});
+
+router.post("/search/occupational", async (req, res) => {
+  try {
+    const { gender, startAge, endAge, occupation, showPhoto } = req.body;
+    let query = { gender };
+
+    // Add age filter
+    query.dob = {
+      $gte: new Date().getFullYear() - endAge,
+      $lte: new Date().getFullYear() - startAge
+    };
+
+    // Add occupation filter
+    if (occupation !== "Any") query.occupation = occupation;
+
+    // Add photo filter
+    if (showPhoto) query.photo = { $exists: true, $ne: null };
+
+    const users = await Register.find(query);
+    res.json(users);
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+});
+
+router.post("/search/location", async (req, res) => {
+  try {
+    const { gender, age, state, district, photo } = req.body;
+    let query = { gender };
+
+    // Add age filter
+    query.dob = {
+      $gte: new Date().getFullYear() - age.to,
+      $lte: new Date().getFullYear() - age.from
+    };
+
+    // Add location filters
+    if (state) query.state = state;
+    if (district) query.district = district;
+
+    // Add photo filter
+    if (photo) query.photo = { $exists: true, $ne: null };
+
+    const users = await Register.find(query);
+    res.json(users);
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+});
+
+router.post("/search/id", async (req, res) => {
+  try {
+    const { matrimonyID } = req.body;
+    const user = await Register.findById(matrimonyID);
+    
+    if (!user) {
+      return res.status(404).json({ message: "Profile not found" });
+    }
+    
+    res.json(user);
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+});
+
+router.post("/search/advanced", async (req, res) => {
+  try {
+    const { nativePlaces, education, stars } = req.body;
+    let query = {};
+
+    // Add native place filter
+    if (nativePlaces.length > 0) {
+      query.nativePlace = { $in: nativePlaces };
+    }
+
+    // Add education filter
+    if (education.length > 0) {
+      query.education = { $in: education };
+    }
+
+    // Add star filter
+    if (stars.length > 0) {
+      query.star = { $in: stars };
+    }
+
+    const users = await Register.find(query);
+    res.json(users);
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+});
+
+
 // Route to add a new user to the "register" collection
 router.post("/register", async (req, res) => {
   try {

@@ -18,9 +18,27 @@ const Occupationalsearch = () => {
         });
       };
     
-      const handleSubmit = (e) => {
+      const handleSubmit = async (e) => {
         e.preventDefault();
-        console.log(formData);
+        try {
+          const response = await fetch('http://localhost:5000/api/search/occupational', {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({
+              gender: formData.gender,
+              startAge: parseInt(formData.startAge),
+              endAge: parseInt(formData.endAge),
+              occupation: formData.occupation,
+              showPhoto: formData.showPhoto
+            })
+          });
+          const data = await response.json();
+          window.location.href = `/search?source=occupational&profiles=${encodeURIComponent(JSON.stringify(data))}`;
+        } catch (error) {
+          console.error('Error performing search:', error);
+        }
       };
   return (
     <div className="flex">

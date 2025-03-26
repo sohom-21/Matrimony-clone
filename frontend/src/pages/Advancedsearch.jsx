@@ -20,6 +20,26 @@ const Advancedsearch = () => {
     setState(state.filter((i) => i !== item));
   };
 
+  const handleSubmit = async () => {
+    try {
+      const response = await fetch('http://localhost:5000/api/search/advanced', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          nativePlaces,
+          education,
+          stars
+        })
+      });
+      const data = await response.json();
+      window.location.href = `/search?source=advanced&profiles=${encodeURIComponent(JSON.stringify(data))}`;
+    } catch (error) {
+      console.error('Error performing search:', error);
+    }
+  };
+
     return (
         <div className="flex">
             <div className="flex min-h-screen bg-gray-100 p-5">

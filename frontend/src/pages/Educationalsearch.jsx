@@ -8,10 +8,21 @@ const Educationalsearch = () => {
     const [education, setEducation] = useState("Any");
     const [photoOnly, setPhotoOnly] = useState(false);
 
-    const handleSubmit = (e) => {
+    const handleSubmit = async (e) => {
         e.preventDefault();
-        const searchParams = { gender, startAge, endAge, education, photoOnly };
-        console.log("Search parameters:", searchParams);
+        try {
+            const response = await fetch('http://localhost:5000/api/search/educational', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({ gender, startAge, endAge, education, photoOnly })
+            });
+            const data = await response.json();
+            window.location.href = `/search?source=educational&profiles=${encodeURIComponent(JSON.stringify(data))}`;
+        } catch (error) {
+            console.error('Error performing search:', error);
+        }
     };
     return (
         <div className="flex">

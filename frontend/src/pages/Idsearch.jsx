@@ -3,15 +3,43 @@ import SidebarMenu from "../components/sidebarmenu"; // Adjust the path as neede
 
 const Idsearch = () => {
     const [matrimonyID, setMatrimonyID] = useState("");
+    const [loading, setLoading] = useState(false);
+    const [error, setError] = useState("");
+    const [profile, setProfile] = useState(null);
 
-  const handleSubmit = (event) => {
+  const handleSubmit = async (event) => {
     event.preventDefault();
     if (!matrimonyID) {
-      alert("Please enter a Matrimony ID");
+      setError("Please enter a Matrimony ID");
       return;
     }
-    console.log("Searching for Matrimony ID:", matrimonyID);
-    // Implement the actual form submission logic here
+
+    setLoading(true);
+    setError("");
+    setProfile(null);
+
+    try {
+      const response = await fetch('http://localhost:5000/api/search/id', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ matrimonyID })
+      });
+
+      const data = await response.json();
+      
+      if (!response.ok) {
+        throw new Error(data.message || 'Failed to fetch profile');
+      }
+
+      // Navigate to search results with the profile data
+      window.location.href = `/search?source=id&profiles=${encodeURIComponent(JSON.stringify([data]))}`;
+    } catch (err) {
+      setError(err.message);
+    } finally {
+      setLoading(false);
+    }
   };
   return (
     <div className="flex">
@@ -49,6 +77,31 @@ const Idsearch = () => {
         creation. Ensure you enter the correct Matrimony ID to get the
         specific result.
       </p>
+
+      {loading && (
+        <div className="mt-4 text-center text-gray-600">
+          Loading profile...
+        </div>
+      )}
+
+      {error && (
+        <div className="mt-4 text-center text-red-600">
+          {error}
+        </div>
+      )}
+
+      {profile && (
+        <div className="mt-4 p-4 border rounded-lg">
+          <h3 className="font-bold text-lg mb-2">Profile Details</h3>
+          <div className="space-y-2">
+            <p><span className="font-medium">Name:</span> {profile.name}</p>
+            <p><span className="font-medium">Age:</span> {profile.age}</p>
+            <p><span className="font-medium">Gender:</span> {profile.gender}</p>
+            <p><span className="font-medium">Education:</span> {profile.education}</p>
+            <p><span className="font-medium">Occupation:</span> {profile.occupation}</p>
+          </div>
+        </div>
+      )}
     </div>
     </div>
   );
