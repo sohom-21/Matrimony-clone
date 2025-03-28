@@ -1,4 +1,5 @@
 import React from "react";
+import { Link } from "react-router-dom";
 
 const menuItems = [
   {
@@ -8,16 +9,16 @@ const menuItems = [
       { name: "Advanced Search", href: "/advancedsearch" },
       { name: "Occupational Search", href: "/occupationalsearch" },
       { name: "Educational Search", href: "/educationalsearch" },
-      { name: "ID Search", href: "/Idsearch" },
+      { name: "ID Search", href: "/idsearch" },
       { name: "Location Search", href: "/locationsearch" },
     ],
   },
   {
     title: "General",
     links: [
-      { name: "Refer a Friend", href: "referafriend.php" },
-      { name: "Success Stories", href: "successstory.php" },
-      { name: "Contact Us", href: "reachus.php" },
+      { name: "Refer a Friend", href: "/referafriend" },
+      { name: "Success Stories", href: "/successstories" },
+      { name: "Contact Us", href: "/contact" },
     ],
   },
 ];
@@ -33,12 +34,12 @@ const SidebarMenu = () => {
           <ul className="mt-2">
             {section.links.map((link, i) => (
               <li key={i} className="border-b last:border-none">
-                <a
-                  href={link.href}
+                <Link
+                  to={link.href}
                   className="block py-2 px-2 text-gray-600 hover:bg-gray-100 hover:text-gray-900"
                 >
                   {link.name}
-                </a>
+                </Link>
               </li>
             ))}
           </ul>

@@ -10,7 +10,7 @@ import Occupationalsearch from './pages/Occupationalsearch';
 import Smartsearch from './pages/Smartsearch';
 import Search from './pages/SearchResults'
 
-function App() {
+const App = () => {
   return (
     <Router>
       <Routes>
@@ -22,10 +22,9 @@ function App() {
         <Route path='/occupationalsearch' element={<Occupationalsearch />} />
         <Route path='/smartsearch' element={<Smartsearch />} />
         <Route path='/search' element={<Search />} />
-        
       </Routes>
     </Router>
   );
-}
+};
 
 export default App;
