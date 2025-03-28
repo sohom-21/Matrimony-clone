@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import Captcha from '../components/Captcha';
 
-const RegistrationForm = () => {
+const Register = () => {
   const [formData, setFormData] = useState({
     name: "",
     maritalStatus: "",
@@ -80,10 +80,20 @@ const RegistrationForm = () => {
   };
 
   const handleFileUpload = (event) => {
-    const file = event.target.files[0]; // Get the selected file
+    const file = event.target.files[0];
     if (file) {
-      console.log("Selected file:", file);
-      // You can handle file validation (size, type) here
+      // Validate file size (max 1MB)
+      if (file.size > 1024 * 1024) {
+        setErrors(prev => ({ ...prev, photo: 'Photo size must be less than 1MB' }));
+        return;
+      }
+      // Validate file type
+      if (!file.type.startsWith('image/')) {
+        setErrors(prev => ({ ...prev, photo: 'Please upload an image file' }));
+        return;
+      }
+      setFormData(prev => ({ ...prev, photo: file }));
+      setErrors(prev => ({ ...prev, photo: null }));
     }
   };
   
@@ -174,12 +184,21 @@ const RegistrationForm = () => {
     if (Object.keys(newErrors).length === 0) {
       setIsSubmitting(true);
       try {
+        const formDataToSend = new FormData();
+        
+        // Append photo if selected
+        if (formData.photo) {
+          formDataToSend.append('photo', formData.photo);
+        }
+
+        // Convert form data to JSON string and append as 'data'
+        const dataToSend = { ...formData };
+        delete dataToSend.photo; // Remove photo from JSON data as it's handled separately
+        formDataToSend.append('data', JSON.stringify(dataToSend));
+
         const response = await fetch('http://localhost:5000/api/auth/register', {
           method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-          },
-          body: JSON.stringify(formData)
+          body: formDataToSend
         });
 
         const data = await response.json();
@@ -1090,4 +1109,4 @@ const RegistrationForm = () => {
   );
 };
 
-export default RegistrationForm;
+export default Register;
