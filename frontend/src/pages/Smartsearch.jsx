@@ -23,7 +23,7 @@ const Smartsearch = () => {
     const handleSubmit = async (e) => {
         e.preventDefault();
         try {
-            const response = await fetch('https://matrimony-clone.onrender.com/api/search/smart', {
+            const response = await fetch('http://localhost:5000/api/search/smart', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',

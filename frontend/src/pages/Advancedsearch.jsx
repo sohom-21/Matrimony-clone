@@ -22,7 +22,7 @@ const Advancedsearch = () => {
 
   const handleSubmit = async () => {
     try {
-      const response = await fetch('https://matrimony-clone.onrender.com/api/search/advanced', {
+      const response = await fetch('http://localhost:5000/api/search/advanced', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
