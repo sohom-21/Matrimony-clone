@@ -1,5 +1,7 @@
-import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
-//Registration import
+import { Router } from 'react-router-dom';
+import React from 'react';
+import { Routes, Route } from 'react-router-dom';
+//Registration import 
 import Register from './pages/Register';
 import Idsearch from './pages/Idsearch';
 import Advancedsearch from './pages/Advancedsearch';
