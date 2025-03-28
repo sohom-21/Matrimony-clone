@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import Captcha from '../components/Captcha';
 
-const Register = () => {
+const RegistrationForm = () => {
   const [formData, setFormData] = useState({
     name: "",
     maritalStatus: "",
@@ -1109,4 +1109,4 @@ const Register = () => {
   );
 };
 
-export default Register;
+export default RegistrationForm;
