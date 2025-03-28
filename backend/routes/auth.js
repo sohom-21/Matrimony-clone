@@ -1,7 +1,7 @@
-const express = require('express');
+import express from 'express';
 const router = express.Router();
-const Register = require('../models/Register');
-const bcrypt = require('bcryptjs');
+import Register from '../models/Register.js';
+import bcrypt from 'bcryptjs';
 
 router.post('/register', async (req, res) => {
   try {
@@ -48,4 +48,4 @@ router.post('/register', async (req, res) => {
   }
 });
 
-module.exports = router;
+export default router; // Changed to ES module export

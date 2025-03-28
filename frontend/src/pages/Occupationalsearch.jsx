@@ -21,7 +21,7 @@ const Occupationalsearch = () => {
       const handleSubmit = async (e) => {
         e.preventDefault();
         try {
-          const response = await fetch('https://matrimony-clone.onrender.com/api/search/occupational', {
+          const response = await fetch('http://localhost:5000/api/search/occupational', {
             method: 'POST',
             headers: {
               'Content-Type': 'application/json',

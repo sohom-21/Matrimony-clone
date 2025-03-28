@@ -1,5 +1,5 @@
-const express = require("express");
-const Register = require("../models/Register");
+import express from "express";
+import Register from "../models/Register.js";
 
 const router = express.Router();
 
@@ -261,4 +261,4 @@ router.delete("/users/:id", async (req, res) => {
   }
 });
 
-module.exports = router;
+export default router;
