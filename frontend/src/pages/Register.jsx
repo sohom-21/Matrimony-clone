@@ -12,6 +12,7 @@ const RegistrationForm = () => {
     motherName: "",
     occupationFather: "",
     occupationMother: "",
+    knownLanguages: "",
     nativePlace: "",
     houseName: "",
     temple: "",
@@ -20,9 +21,9 @@ const RegistrationForm = () => {
     marriedBrothers: 0,
     sisters: 0,
     marriedSisters: 0,
-    referral1Name: "",
-    referral1Phone: "",
-    referral1Address: "",
+    referral: "",
+    referralDetails1: "",
+    referralDetails2: "",
     education: "",
     educationDetails: "",
     occupation: "",
@@ -34,7 +35,6 @@ const RegistrationForm = () => {
     complexion: "",
     diet: "",
     specialCases: "",
-    specialCasesDetails: "",
     rasi: "",
     lagnam: "",
     star: "",
@@ -42,9 +42,8 @@ const RegistrationForm = () => {
     birthPlace: "",
     birthTime: "",
     dasaType: "",
-    dasaYear: "",
-    dasaMonth: "",
-    dasaDay: "",
+    horoscope: "",
+    contactAddress: "",
     address: "",
     mobile: "",
     city: "",
@@ -54,7 +53,6 @@ const RegistrationForm = () => {
     district: "",
     email: "",
     country: "India",
-    photo: null,
     postalCode: "",
     partnerPreference: {
       education: "",
@@ -79,25 +77,6 @@ const RegistrationForm = () => {
     });
   };
 
-  const handleFileUpload = (event) => {
-    const file = event.target.files[0];
-    if (file) {
-      // Validate file size (max 1MB)
-      if (file.size > 1024 * 1024) {
-        setErrors(prev => ({ ...prev, photo: 'Photo size must be less than 1MB' }));
-        return;
-      }
-      // Validate file type
-      if (!file.type.startsWith('image/')) {
-        setErrors(prev => ({ ...prev, photo: 'Please upload an image file' }));
-        return;
-      }
-      setFormData(prev => ({ ...prev, photo: file }));
-      setErrors(prev => ({ ...prev, photo: null }));
-    }
-  };
-  
-
   const [errors, setErrors] = useState({});
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [captchaVerified, setCaptchaVerified] = useState(false);
@@ -121,12 +100,9 @@ const RegistrationForm = () => {
       newErrors.email = 'Email is invalid';
     }
     
-    // Mobile validation
-    if (!formData.mobile) {
-      newErrors.mobile = 'Mobile number is required';
-    } else if (!/^\d{10}$/.test(formData.mobile)) {
-      newErrors.mobile = 'Mobile number must be 10 digits';
-    }
+   
+
+  
     
     // Additional required fields
     if (!formData.fatherName?.trim()) newErrors.fatherName = 'Father\'s name is required';
@@ -146,104 +122,43 @@ const RegistrationForm = () => {
       newErrors.whatsapp = 'WhatsApp number must be 10 digits';
     }
     
-    // Photo validation
-    if (formData.photo) {
-      const file = formData.photo;
-      if (file.size > 1024 * 1024) { // 1MB
-        newErrors.photo = 'Photo size must be less than 1MB';
-      }
-      if (!file.type.startsWith('image/jpeg')) {
-        newErrors.photo = 'Photo must be in JPG format';
-      }
-    }
     
-    // Partner preference validations
-    if (!formData.partnerPreference.ageFrom || !formData.partnerPreference.ageTo) {
-      newErrors.partnerAge = 'Partner age range is required';
-    }
-    if (parseInt(formData.partnerPreference.ageFrom) >= parseInt(formData.partnerPreference.ageTo)) {
-      newErrors.partnerAge = 'Invalid age range';
-    }
-    
-    // Terms and CAPTCHA validation
-    if (!formData.termsAccepted) {
-      newErrors.termsAccepted = 'You must accept the terms and conditions';
-    }
-    if (!captchaVerified) {
-      newErrors.captcha = 'Please verify the CAPTCHA';
-    }
     
     return newErrors;
   };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+    console.log('Form Data before validation:', formData);
     const newErrors = validateForm();
     setErrors(newErrors);
+
+    console.log('Validation errors:', newErrors);
 
     if (Object.keys(newErrors).length === 0) {
       setIsSubmitting(true);
       try {
-        const formDataToSend = new FormData();
-        
-        // Append photo if selected
-        if (formData.photo) {
-          formDataToSend.append('photo', formData.photo);
-        }
-
-        // Convert form data to JSON string and append as 'data'
-        const dataToSend = { ...formData };
-        delete dataToSend.photo; // Remove photo from JSON data as it's handled separately
-        formDataToSend.append('data', JSON.stringify(dataToSend));
-
+        console.log('Sending form data to server:', formData);
         const response = await fetch('http://localhost:5000/api/auth/register', {
           method: 'POST',
-          body: formDataToSend
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify(formData)
         });
 
-        const data = await response.json();
-        
-        if (data.success) {
+        if (response.ok) {
+          console.log('Registration successful');
           alert('Registration successful!');
-          // Reset form to initial state
-          setFormData({
-            name: "", maritalStatus: "", password: "", dob: "", gender: "",
-            fatherName: "", motherName: "", occupationFather: "", occupationMother: "",
-            nativePlace: "", houseName: "", temple: "", presentResidence: "",
-            brothers: 0, marriedBrothers: 0, sisters: 0, marriedSisters: 0,
-            referral1Name: "", referral1Phone: "", referral1Address: "",
-            education: "", educationDetails: "", occupation: "",
-            workDetails: "", workingPlace: "", income: "",
-            height: "", weight: "", complexion: "", diet: "",
-            specialCases: "", specialCasesDetails: "",
-            rasi: "", lagnam: "", star: "", dosham: "",
-            birthPlace: "", birthTime: "",
-            dasaType: "", dasaYear: "", dasaMonth: "", dasaDay: "",
-            address: "", mobile: "", city: "", phone: "",
-            state: "", whatsapp: "", district: "", email: "",
-            country: "India", photo: null, postalCode: "",
-            partnerPreference: {
-              education: "", ageFrom: "", ageTo: "",
-              educationDetails: "", workAfterMarriage: "",
-              complexion: "", heightFrom: "", heightTo: "",
-              personalPreference: ""
-            },
-            verificationCode: "",
-            termsAccepted: false
-          });
-          setCaptchaVerified(false);
+          // Reset form or redirect
         } else {
-          setErrors({ 
-            submit: data.message || 'Registration failed',
-            ...(data.errors ? { serverValidation: data.errors } : {})
-          });
+          const errorData = await response.json();
+          console.log('Server response error:', errorData);
+          setErrors(prev => ({ ...prev, submit: errorData.message || 'Registration failed' }));
         }
       } catch (error) {
-        console.error('Error during registration:', error);
-        setErrors({ 
-          submit: 'Network error. Please try again.',
-          technical: error.message
-        });
+        console.error('Network error:', error);
+        setErrors(prev => ({ ...prev, submit: 'Network error occurred' }));
       } finally {
         setIsSubmitting(false);
       }
@@ -469,21 +384,21 @@ const RegistrationForm = () => {
 
         <div className="flex justify-between">
           <div className="flex flex-col w-2/5">
-            <label className="block font-medium">Referral 1 Name:</label>
+            <label className="block font-medium">Referral</label>
             <input
               type="text"
               name="referral1Name"
-              value={formData.referral1Name}
+              value={formData.referral}
               onChange={handleChange}
               className="w-full p-1 border rounded"
             />
           </div>
           <div className="flex flex-col w-2/5">
-            <label className="block font-medium">Referral 1 Phone:</label>
+            <label className="block font-medium">Referral Details 1</label>
             <input
               type="text"
               name="referral1Phone"
-              value={formData.referral1Phone}
+              value={formData.referralDetails1}
               onChange={handleChange}
               className="w-full p-1 border rounded"
             />
@@ -491,10 +406,10 @@ const RegistrationForm = () => {
         </div>
 
         <div className="flex flex-col w-full">
-          <label className="block font-medium">Referral 1 Address:</label>
+          <label className="block font-medium">Referral 2</label>
           <textarea
             name="referral1Address"
-            value={formData.referral1Address}
+            value={formData.referralDetails2}
             onChange={handleChange}
             className="w-full p-1 border rounded"
           ></textarea>
@@ -900,16 +815,7 @@ const RegistrationForm = () => {
     />
   </div>
 
-  <div className="flex justify-between items-center">
-    <label className="font-medium w-1/3">Photo (Max: 1MB, JPG only):</label>
-    <input
-      type="file"
-      name="photo"
-      accept="image/jpeg"
-      onChange={handleFileUpload}
-      className="w-2/3 p-2 border rounded"
-    />
-  </div>
+  
   <div className="flex justify-between">
         <div className="flex flex-col w-2/5">
           <label className="font-medium">Education:</label>
@@ -1101,8 +1007,13 @@ const RegistrationForm = () => {
         </p>
       </div>
 
-        <button type="submit" className="w-full bg-blue-500 text-white py-2 rounded">
-          Submit
+        <button 
+          type="submit" 
+          className="w-full bg-blue-500 text-white py-2 rounded hover:bg-blue-600 transition-colors"
+          disabled={isSubmitting}
+          
+        >
+          {isSubmitting ? 'Submitting...' : 'Submit'}
         </button>
       </form>
     </div>
