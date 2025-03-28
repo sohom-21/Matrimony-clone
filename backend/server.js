@@ -3,6 +3,9 @@ const mongoose = require('mongoose');
 const cors = require('cors');
 const authRoutes = require('./routes/auth');
 const userRoutes = require('./routes/userRoutes');
+const dotenv = require('dotenv');
+
+dotenv.config(); // Load environment variables from .env file
 
 const app = express();
 
@@ -15,7 +18,7 @@ app.use('/api/auth', authRoutes);
 app.use('/api', userRoutes);
 
 // MongoDB connection
-mongoose.connect('mongodb://localhost:27017/Matrimony', {  // Changed 'matrimony' to 'Matrimony'
+mongoose.connect(process.env.MONGO_URI,{  // Changed 'matrimony' to 'Matrimony'
   useNewUrlParser: true,
   useUnifiedTopology: true
 })

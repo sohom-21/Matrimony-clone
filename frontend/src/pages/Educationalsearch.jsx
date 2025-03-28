@@ -11,7 +11,7 @@ const Educationalsearch = () => {
     const handleSubmit = async (e) => {
         e.preventDefault();
         try {
-            const response = await fetch('http://localhost:5000/api/search/educational', {
+            const response = await fetch('https://matrimony-clone.onrender.com/api/search/educational', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
